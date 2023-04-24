@@ -1,0 +1,62 @@
+
+//导入数据操作模块
+const db = require('../db/index')
+
+//导入加密模块
+const bcrypt = require('bcryptjs')
+
+
+module.exports.regUser = function (req, res) {
+
+    //接收表单数据
+    const userinfo = req.body
+
+    if (!userinfo.username || !userinfo.password) {
+
+        return res.send({ status: 1, message: '用户名或者密码帮你为空！' })
+    }
+
+    //定义查询SQ语句
+    const sqlStr = 'select * from ev_users  where username=?'
+    //查询数据库
+    db.query(sqlStr, userinfo.username, function (err, results) {
+
+        if (err) return res.send({ status: 1, message: err.message })
+
+        console.log("length===>>"+results.length)
+
+        if (results.length > 0) {
+            
+            return res.send({status:1,message:'用户名被占用，请更换其它用户名！'})
+        }
+    })
+
+    //对密码进行bcrype加密，返回值是加密之后的密码字符串
+    userinfo.password = bcrypt.hashSync(userinfo.password,10)
+
+    //定义插入用户的SQL语句
+    const insertSql ='insert into ev_users set?'
+
+    db.query(insertSql,userinfo,function(err,results){
+
+        if (err) return res.send({ status: 1, message: err.message })
+
+        if (results.affectedRows !== 1) {
+
+            return res.send({status:1,message:'注册用户失败，请稍后重试！'})
+        }
+
+        return res.send({status:0,message:'注册成功！'})
+    })
+
+}
+
+module.exports.login = function (req, res) {
+
+    res.send("login Ok")
+}
+
+module.exports.info = function (req, res) {
+
+    res.send("info Ok")
+}
