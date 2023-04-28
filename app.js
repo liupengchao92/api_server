@@ -13,7 +13,16 @@ app.use(cors())
 //5.配置解析表单数据的中间件
 app.use(express.urlencoded({ extended: false }))
 
-//6.响应数据的中间件
+//导入配置文件
+const config = require('./config')
+
+//配置解析Token的中间件
+const expressJWT = require('express-jwt')
+
+//使用 .unless({ path: [/^\/api\//] }) 指定哪些接口不需要进行 Token 的身份认证
+app.use(expressJWT({ secret: config.jwtSecretKey }).unless({ path: [/^\/api\//,/^\/user\//] }))
+
+//响应数据的中间件
 app.use(function (req, res, next) {
 
     // status = 0 为成功； status = 1 为失败； 默认将 status 的值设置为 1，方便处理失败的情况
@@ -40,11 +49,15 @@ const joi = require('joi')
 //全局错误中间件
 app.use(function (err, erq, res, next) {
 
-    console.log("发生了错误！")
+    //config.log(err.message)
 
     //数据验证失败
     if (err instanceof joi.ValidationError) return res.cc(err)
 
+    //身份认证失败
+    if(err.name === 'UnauthorizedError') return res.cc('身份认证失败！')
+
+    console.log(err.message)
     //未知错误
     res.cc(err)
 
