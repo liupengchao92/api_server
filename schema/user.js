@@ -23,5 +23,22 @@ module.exports.reg_login_schema = {
         username,
         password
     }
+}
 
+//用户ID的验证规则
+const id = joi.number().integer().min(1).required()
+
+//用户昵称的验证规则
+const nickname = joi.string().required()
+
+//邮箱的验证规则
+const email = joi.string().email().required()
+
+//更新用户信息表单的验证规则对象
+module.exports.update_userinfo_schema = {
+    body: {
+        id,
+        nickname,
+        email,
+    },
 }
