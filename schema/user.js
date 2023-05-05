@@ -55,4 +55,14 @@ exports.update_password_schema = {
         newPwd: joi.not(joi.ref('oldPwd')).concat(password),
     },
 }
-    // 导入需要的验证规
+
+
+//头像验证规则
+const avatar = joi.string().dataUri().required()
+
+exports.update_avatar_schema = {
+
+    body:{
+        avatar,
+    }
+}

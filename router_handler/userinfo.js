@@ -80,5 +80,31 @@ module.exports.updatePassword = function (req, res) {
         })
 
     })
-
 }
+
+//修改用户头像
+module.exports.updateAvatar = function (req, res) {
+
+    const sqlStr = 'select * from ev_users where id =?'
+
+    db.query(sqlStr, req.user.id, function (err, results) {
+
+        //执行SQL异常
+        if (err) return res.cc(err)
+
+        if (results.length !== 1) return res.cc('用户不存在！')
+
+        const sqlStr1 = 'update ev_users set user_pic = ? where id = ?'
+
+        db.query(sqlStr1, [req.body.avatar, req.user.id], (err, results) => {
+            //执行SQL异常
+            if (err) return res.cc(err)
+
+            if (results.affectedRows !== 1) return res.cc('修改头像失败')
+
+            return res.cc('修改头像成功！', 0)
+
+        })
+    })
+}
+
