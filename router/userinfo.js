@@ -12,13 +12,16 @@ const expressJoi = require('@escook/express-joi')
 const router_handler = require('../router_handler/userinfo')
 
 //导入用户信息验证规则对象
-const { update_userinfo_schema } = require('../schema/user')
+const { update_userinfo_schema,update_password_schema } = require('../schema/user')
 
 //获取用户的基本信息
 router.get('/userinfo', router_handler.getUserInfo)
 
 //更新用户信息
 router.post('/update', expressJoi(update_userinfo_schema), router_handler.updateUserInfo)
+
+//重置用户密码
+router.post('/updatepsw',expressJoi(update_password_schema),router_handler.updatePassword)
 
 //向外共享用户信息路由模块
 module.exports = router

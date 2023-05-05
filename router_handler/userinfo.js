@@ -2,6 +2,8 @@
 //导入数据库操作模块
 const db = require('../db/index')
 
+const bcrypt = require('bcryptjs')
+
 //获取用户信息
 module.exports.getUserInfo = function (req, res) {
 
@@ -29,9 +31,7 @@ module.exports.updateUserInfo = function (req, res) {
 
     const sqlStr = 'update ev_users set ? where id = ?'
 
-    console.log(req.body)
-
-    db.query(sqlStr, [req.body, req.body.id], function (err, results) {
+    db.query(sqlStr, [req.body, req.user.id], function (err, results) {
 
         if (err) return res.cc(err)
 
@@ -39,7 +39,46 @@ module.exports.updateUserInfo = function (req, res) {
 
         if (results.affectedRows !== 1) return res.cc('修改用户基本信息失败！')
 
-        return res.cc('修改用户基本信息成功',0)
+        return res.cc('修改用户基本信息成功', 0)
 
     })
+}
+
+//重置用户密码
+module.exports.updatePassword = function (req, res) {
+
+    const sqlStr = 'select * from ev_users where id = ?'
+
+    db.query(sqlStr, req.user.id, function (err, results) {
+
+        //执行SQL发生错误
+        if (err) return res.cc(err)
+
+        if (results.length !== 1) return res.cc('用户不存在')
+
+        //用户存在，判断提交的密码是否正确
+        const compareResult = bcrypt.compareSync(req.body.oldPwd, results[0].password)
+
+        // 对新密码进行 bcrypt 加密处理
+        const newPwd = bcrypt.hashSync(req.body.newPwd, 10)
+
+        if (!compareResult) return res.cc('原密码错误！')
+
+        const sqlStr1 = 'update ev_users set password =? where id = ?'
+
+        db.query(sqlStr1, [newPwd, req.user.id], (err, results) => {
+
+            //执行SQL发生错误
+            if (err) return res.cc(err)
+
+            console.log(results)
+
+            if (results.affectedRows !== 1) return res.cc('修改密码失败！')
+
+            return res.cc('更新密码成功', 0)
+
+        })
+
+    })
+
 }
