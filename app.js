@@ -45,6 +45,10 @@ app.use('/user', userRouter)
 const infoRouter = require('./router/userinfo')
 app.use('/my', infoRouter)
 
+//导入并注册文章分类模块
+const artCatesRouter = require('./router/artcate')
+app.use('/my/article',artCatesRouter)
+
 //导入验证校验模块
 const joi = require('joi')
 
