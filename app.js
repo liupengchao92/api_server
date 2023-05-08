@@ -13,6 +13,9 @@ app.use(cors())
 //5.配置解析表单数据的中间件
 app.use(express.urlencoded({ extended: false }))
 
+// 托管静态资源文件
+app.use('/uploads', express.static('./uploads'))
+
 //导入配置文件
 const config = require('./config')
 
@@ -48,6 +51,11 @@ app.use('/my', infoRouter)
 //导入并注册文章分类模块
 const artCatesRouter = require('./router/artcate')
 app.use('/my/article',artCatesRouter)
+
+//导入并注册文章模块
+const articlesRouter = require('./router/articles')
+app.use('/my/article',articlesRouter)
+
 
 //导入验证校验模块
 const joi = require('joi')

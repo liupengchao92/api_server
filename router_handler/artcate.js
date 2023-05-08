@@ -89,28 +89,45 @@ module.exports.getArticleCateById = function (req, res) {
         //返回查询的数据
         return res.send(
             {
-                status:0,
-                data:results[0]
+                status: 0,
+                data: results[0]
             }
         )
     })
 }
 
 //根据ID更新分类
-module.exports.updateArticleCate = (req,res) =>{
+module.exports.updateArticleCate = (req, res) => {
 
-    const sql = 'update ev_article_cate set ? where  id = ?'
-    
-    db.query(sql,[req.body,req.body.id],(error,results) =>{
+    //定义查重的SQL               
+    const sqlStr = `select * from ev_article_cate where Id<>? and (name=? or alias=?)`
 
-        //执行SQL发生异常
-        if(error) return res(error)
+    // 执行查重操作
+    db.query(sqlStr, [req.body.Id, req.body.name, req.body.alias], (err, results) => {
+        // 执行 SQL 语句失败
+        if (err) return res.cc(err)
 
-        if(results.affectedRows !== 1) return res.cc('更新文章分类失败！')
+        // 分类名称 和 分类别名 都被占用
+        if (results.length === 2) return res.cc('分类名称与别名被占用，请更换后重试！')
+        if (results.length === 1 && results[0].name === req.body.name && results[0].alias === req.body.alias) return res.cc('分类名称与别名被占用，请更换后重试！')
+        // 分类名称 或 分类别名 被占用
+        if (results.length === 1 && results[0].name === req.body.name) return res.cc('分类名称被占用，请更换后重试！')
+        if (results.length === 1 && results[0].alias === req.body.alias) return res.cc('分类别名被占用，请更换后重试！')
 
-        res.cc('更新文章成功',0)
+        console.log("length=========:"+results.length)
 
+        // TODO：更新文章分类
+        const sql = 'update ev_article_cate set ? where  id = ?'
+
+        db.query(sql, [req.body, req.body.id], (error, results) => {
+
+            //执行SQL发生异常
+            if (error) return res.cc(error)
+
+            if (results.affectedRows !== 1) return res.cc('更新文章分类失败！')
+
+            res.cc('更新文章成功', 0)
+
+        })
     })
-    
-
 }
