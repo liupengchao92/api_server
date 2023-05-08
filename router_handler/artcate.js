@@ -95,3 +95,22 @@ module.exports.getArticleCateById = function (req, res) {
         )
     })
 }
+
+//根据ID更新分类
+module.exports.updateArticleCate = (req,res) =>{
+
+    const sql = 'update ev_article_cate set ? where  id = ?'
+    
+    db.query(sql,[req.body,req.body.id],(error,results) =>{
+
+        //执行SQL发生异常
+        if(error) return res(error)
+
+        if(results.affectedRows !== 1) return res.cc('更新文章分类失败！')
+
+        res.cc('更新文章成功',0)
+
+    })
+    
+
+}
