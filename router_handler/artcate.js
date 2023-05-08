@@ -1,5 +1,6 @@
 
 //导入数据库操作对象
+const { error } = require('@hapi/joi/lib/base')
 const db = require('../db/index')
 
 //获取分类列表
@@ -54,7 +55,7 @@ module.exports.addArticleCate = function (req, res) {
     })
 }
 
-//删除文章分类
+//根据Id删除文章分类
 module.exports.deleteArticleCateById = function (req, res) {
 
     const sqlStr = 'update ev_article_cate set is_delete = 1  where id = ?'
@@ -68,5 +69,29 @@ module.exports.deleteArticleCateById = function (req, res) {
 
         return res.cc('删除分类成功', 0)
 
+    })
+}
+
+//根据Id获取文章分类
+module.exports.getArticleCateById = function (req, res) {
+
+    console.log(req.params)
+
+    const sqlStr = 'select * from ev_article_cate where id = ?'
+
+    db.query(sqlStr, req.params.id, (error, results) => {
+
+        //执行SQL发生错误
+        if (error) return res.cc(error)
+
+        if (results.length !== 1) return res.cc('查询分类不存在')
+
+        //返回查询的数据
+        return res.send(
+            {
+                status:0,
+                data:results[0]
+            }
+        )
     })
 }

@@ -24,3 +24,10 @@ module.exports.delete_cate_schema  = {
         id,
     }
 }
+
+//校验规则对象
+module.exports.get_cate_schema  = {
+    params:{
+        id,
+    }
+}
